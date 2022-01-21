@@ -22,7 +22,7 @@ If you are looking for this starter project, most probably you already have this
 We will start by creating a NodeJs SAM application using the default template. This will provide us with the default folder structure and all the dependencies required to use SAM.
 
 ```shell
-sam init --name serverless-api-demo --runtime nodejs14.x
+sam init --name hello-world --runtime nodejs14.x --dependency-manager npm --app-template hello-world
 ```
 
 ### Open the project folder in your favorite IDE
@@ -32,8 +32,8 @@ SAM is a command-line tool that supports developers on building, testing and dep
 *:warning: Due to personal preference I will use **Visual Studio Code** for the rest of this document.*
 
 ```shell
-cd serverless-api-demo
-code .                        
+cd hello-world              
+code .  
 ```
 
 ### Initialize NPM
@@ -43,6 +43,8 @@ This step will create a `package.json` file in your root folder. You can create 
 ```shell
 npm init
 ```
+
+*:warning: You need to answer some questions but you can go will all the defaults.*
 
 ### Install dev dependencies
 
@@ -135,7 +137,7 @@ You can adapt the Typescript configuration file to your own preferences but mine
     "target": "es2015",
     "module": "commonjs",
     "sourceMap": true,
-    "rootDir": "./src",
+    "rootDir": "./hello-world",
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
@@ -144,19 +146,51 @@ You can adapt the Typescript configuration file to your own preferences but mine
 }
 ```
 
+*:warning: This configuration specifies that the root directory is `./hello-world` but if you have multiple Lambda functions you would probably prefer to have a `src` folder with all functions in different sub-directories.*
+
+*If that is the case you should update the `rootDir` options with `./src`.*
 ### Configure build scripts
 
 Last thing we need to do is to configure the build scripts to use webpack instead of the default npm scripts. For simplicity sake I only have support for `build` and `watch` commands but you can extend this (e.g. with tests).
 
 Open `package.json` file and add replace the scripts section with the following.
 
-```jsonc
-...
-
+```json
 "scripts": {
-    "build": "webpack-cli",     # uses SAM to build the project and creates bundle ready to publish
-    "watch": "webpack-cli -w"   # allows project debugging
-  }
-  
-...
+    "build": "webpack-cli",     
+    "watch": "webpack-cli -w"   
+  },
 ```
+
+### Update your function code
+
+Now that we have the project configured to support Typescript we only need to replace our Javascript Lambda function with Typescript one.
+
+Rename `hello-world/app.js` to `hello-world/app.ts` and update its content with a very basic Typescript code.
+
+```typescript
+import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
+
+export const lambdaHandler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
+    return {
+        'statusCode': 200,
+        'body': JSON.stringify({
+            message: 'hello world',
+        })
+    }
+};
+
+```
+
+### Build and deploy your Lambda function
+
+Deploy the demo to your AWS account using AWS SAM.
+
+```shell
+npm run build
+sam deploy --guided # if running for the first time. Otherwise you can ignore the '--guided' parameter
+```
+
+The npm run build commmand will first build the hello-world TypeScript function. Then the command sam deploy uses the SAM Template to deploy the resources to your account.
+
+SAM will create an output of the API Gateway endpoint URL for future use in our load tests.
