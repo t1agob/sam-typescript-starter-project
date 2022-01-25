@@ -1,5 +1,6 @@
 # SAM Typescript starter project
 
+![aws provider](https://img.shields.io/badge/provider-AWS-orange?logo=amazon-aws&color=ff9900) [![Build](https://github.com/t1agob/sam-typescript-starter-project/actions/workflows/build.yml/badge.svg?branch=main)](https://github.com/t1agob/sam-typescript-starter-project/actions/workflows/build.yml)
 ## Motivation
 
 I :heart: [Typescript](https://www.typescriptlang.org/), mostly for it's simplicity and 'types' support. For those reasons I tend to use it in most of my serverless projects.
